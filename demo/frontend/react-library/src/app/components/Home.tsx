@@ -4,10 +4,10 @@ const containerStyle = {
   minHeight: "calc(100vh - 153px)"
 };
 
-export default class Main extends React.PureComponent {
+export default class Home extends React.PureComponent {
   render() {
     return (
-      <div>
+      <div className="row">
         <div className="row">
           <div className="col">
             <div className="jumbotron">
