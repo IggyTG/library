@@ -9,7 +9,6 @@ import {
 } from "react-router-dom";
 import { History } from "history";
 import Auth from "../auth";
-import Categories from "./categories";
 
 type MyProps = { history: History };
 type MyState = { username: string; password: string; error: boolean };

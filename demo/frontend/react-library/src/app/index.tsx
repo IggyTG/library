@@ -14,7 +14,7 @@ render(
 );
 
 // Hot Module Replacement API
-declare let module: { hot: any };
+/*declare let module: { hot: any };
 
 if (module.hot) {
   module.hot.accept("./App", () => {
@@ -27,4 +27,4 @@ if (module.hot) {
       rootEl
     );
   });
-}
+}*/
