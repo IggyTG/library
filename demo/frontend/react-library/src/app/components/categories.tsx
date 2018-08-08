@@ -1,11 +1,39 @@
 import * as React from "react";
+import axios from "axios";
+import Auth from "../auth";
+
+const API = "http://localhost:8080/categories";
 
 const containerStyle = {
   minHeight: "calc(100vh - 153px)"
 };
 
-export default class Categories extends React.PureComponent {
+export default class Categories extends React.Component {
+  auth: Auth;
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hits: [],
+      isLoading: false,
+      error: null
+    };
+  }
+
+  componentDidMount() {}
+
   render() {
+    /*const { hits, isLoading, error } = this.state;
+
+    if (error) {
+      return <p>{error.message}</p>;
+    }
+
+    if (isLoading) {
+      return <p>Loading ...</p>;
+    }*/
+
     return (
       <div className="container">
         <div className="row">

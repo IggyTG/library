@@ -2,34 +2,51 @@ import * as React from "react";
 import "./../assets/scss/App.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Categories from "./components/categories";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect, Router } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./components/Home";
+import Login from "./components/login";
+import Auth from "./auth";
 
 const containerStyle = {
   minHeight: "calc(100vh - 153px)"
 };
 
-export interface AppProps {}
+export default class App extends React.Component {
+  constructor(props) {
+    super(props);
+  }
 
-export default class App extends React.Component<AppProps, undefined> {
+  private auth: Auth = new Auth();
+
+  private isLoggedIn(): boolean {
+    return this.auth.isAuthenticated();
+  }
+
   render() {
     return (
-      <Switch>
-        <div className="container">
-          <Header />
-          <div className="container" style={containerStyle}>
-            <div className="row">
-              <div className="col">
-                <Route exact path="/" component={Home} />
+      <div className="container">
+        <Header />
+        <div className="container" style={containerStyle}>
+          <div className="row">
+            <div className="col">
+              <Switch>
+                <Route
+                  exact
+                  path="/"
+                  render={() =>
+                    !this.isLoggedIn() ? <Redirect to="/login" /> : <Home />
+                  }
+                />
+                <Route path="/login" component={Login} />
                 <Route path="/categories" component={Categories} />
-              </div>
+              </Switch>
             </div>
           </div>
-          <Footer />
         </div>
-      </Switch>
+        <Footer />
+      </div>
     );
   }
 }
