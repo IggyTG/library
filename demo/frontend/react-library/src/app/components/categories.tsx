@@ -1,19 +1,22 @@
 import * as React from "react";
 import axios from "axios";
 import Auth, { HTTP_HEADERS } from "../auth";
+import { Category } from "../model/category";
 
 const API = "http://localhost:8080/categories";
 
-export default class Categories extends React.Component {
+type MyState = {
+  categories: Category[];
+};
+
+export default class Categories extends React.Component<any, MyState> {
   auth: Auth;
 
   constructor(props) {
     super(props);
 
     this.state = {
-      hits: [],
-      isLoading: false,
-      error: null
+      categories: []
     };
   }
 
@@ -22,28 +25,24 @@ export default class Categories extends React.Component {
   }
 
   getCategories() {
-    axios
-      .get(API, { headers: HTTP_HEADERS })
-      .then(categories => {
-        console.log("Categories", categories);
-        return categories;
-      })
-      .catch(error => {
-        console.log("Error while login!");
-      });
+    axios.get(API, { headers: HTTP_HEADERS }).then(response => {
+      this.setState({ categories: response.data });
+    });
+  }
+
+  saveCategory(category: Category) {
+    if (category.id) {
+      return axios.put(API, category, { headers: HTTP_HEADERS });
+    } else {
+      return axios.post(API, category, { headers: HTTP_HEADERS });
+    }
+  }
+
+  deleteCategory(categoryId: number) {
+    return axios.delete(API + "/" + categoryId, { headers: HTTP_HEADERS });
   }
 
   render() {
-    /*const { hits, isLoading, error } = this.state;
-
-    if (error) {
-      return <p>{error.message}</p>;
-    }
-
-    if (isLoading) {
-      return <p>Loading ...</p>;
-    }*/
-
     return (
       <div className="container">
         <div className="row">
@@ -67,32 +66,41 @@ export default class Categories extends React.Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row" className="text-center align-middle">
-                      Header
-                    </th>
-                    <td className="text-center align-middle">category.name</td>
-                    <td className="text-center align-middle">
-                      <button
-                        className="btn btn-outline-secondary"
-                        data-toggle="modal"
-                        data-target="#saveCategoryModal"
-                      >
-                        Edit
-                      </button>
-                    </td>
-                    <td className="text-center align-middle">
-                      <span className="d-inline-block">
-                        <button
-                          className="btn btn-danger"
-                          data-toggle="modal"
-                          data-target="#deleteCategoryModal"
-                        >
-                          Delete
-                        </button>
-                      </span>
-                    </td>
-                  </tr>
+                  {this.state.categories.map(function(
+                    category: Category,
+                    index: number
+                  ) {
+                    return (
+                      <tr>
+                        <th scope="row" className="text-center align-middle">
+                          {index + 1}
+                        </th>
+                        <td className="text-center align-middle">
+                          {category.name}
+                        </td>
+                        <td className="text-center align-middle">
+                          <button
+                            className="btn btn-outline-secondary"
+                            data-toggle="modal"
+                            data-target="#saveCategoryModal"
+                          >
+                            Edit
+                          </button>
+                        </td>
+                        <td className="text-center align-middle">
+                          <span className="d-inline-block">
+                            <button
+                              className="btn btn-danger"
+                              data-toggle="modal"
+                              data-target="#deleteCategoryModal"
+                            >
+                              Delete
+                            </button>
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
