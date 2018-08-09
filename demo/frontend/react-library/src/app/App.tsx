@@ -17,6 +17,10 @@ const containerStyle = {
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      isLoggedIn: false
+    };
   }
 
   private auth: Auth = new Auth();

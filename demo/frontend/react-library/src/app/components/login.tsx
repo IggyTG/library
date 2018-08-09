@@ -30,7 +30,7 @@ export default class Login extends React.Component<MyProps, MyState> {
       .login(this.state.username, this.state.password)
       .then(user => {
         console.log("Authenticated!!!");
-        this.props.history.replace("/categories");
+        this.props.history.replace("/home");
       })
       .catch(error => {
         console.log("Not Authenticated!!!");

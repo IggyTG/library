@@ -1,14 +1,36 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import Auth from "../auth";
+import Logout from "./logout";
 
-export default class Header extends React.PureComponent {
+type MyState = {
+  isLoggedIn: boolean;
+  admin: boolean;
+};
+
+export default class Header extends React.Component<any, MyState> {
+  constructor(props) {
+    super(props);
+    this.state = { isLoggedIn: false, admin: false };
+    setInterval(() => this.updateStates(), 1000);
+  }
+
+  updateStates() {
+    this.setState({
+      isLoggedIn: this.auth.isAuthenticated(),
+      admin: this.auth.hasRoleAdmin()
+    });
+  }
+
+  private auth = new Auth();
+
   render() {
     return (
       <nav className="navbar navbar-expand-lg navbar-light bg-light mb-5">
         <div className="container">
-          <Link className="navbar-brand" to="/">
+          <NavLink className="navbar-brand" to="/">
             Library
-          </Link>
+          </NavLink>
           <button
             className="navbar-toggler"
             type="button"
@@ -22,43 +44,63 @@ export default class Header extends React.PureComponent {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav">
-              <li className="nav-item">
-                <Link className="nav-link" to="/categories">
-                  Categories
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/books">
-                  Books
-                </Link>
-              </li>
+              {this.state.isLoggedIn && (
+                <li className="nav-item">
+                  <NavLink
+                    className="nav-link"
+                    activeClassName="is-active"
+                    to="/home"
+                  >
+                    Home
+                  </NavLink>
+                </li>
+              )}
+              {this.state.admin && (
+                <li className="nav-item">
+                  <NavLink
+                    className="nav-link"
+                    activeClassName="is-active"
+                    to="/categories"
+                  >
+                    Categories
+                  </NavLink>
+                </li>
+              )}
+              {this.state.admin && (
+                <li className="nav-item">
+                  <NavLink
+                    className="nav-link"
+                    activeClassName="is-active"
+                    to="/books"
+                  >
+                    Books
+                  </NavLink>
+                </li>
+              )}
             </ul>
             <ul className="navbar-nav ml-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  Login
-                </Link>
-              </li>
-              <li className="nav-item dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="#"
-                  id="navbarDropdownMenuLink"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  {"Username"}
-                </Link>
-                <div
-                  className="dropdown-menu  dropdown-menu-right"
-                  aria-labelledby="navbarDropdownMenuLink"
-                >
-                  <Link className="dropdown-item" to="/">
-                    Logout
-                  </Link>
-                </div>
-              </li>
+              {!this.state.isLoggedIn && (
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/login">
+                    Login
+                  </NavLink>
+                </li>
+              )}
+              {this.state.isLoggedIn && (
+                <li className="nav-item dropdown">
+                  <NavLink
+                    className="nav-link dropdown-toggle"
+                    to="#"
+                    id="navbarDropdownMenuLink"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {this.auth.getUsername()}
+                  </NavLink>
+                </li>
+              )}
+              <Logout />
             </ul>
           </div>
         </div>
