@@ -1,12 +1,8 @@
 import * as React from "react";
 import axios from "axios";
-import Auth from "../auth";
+import Auth, { HTTP_HEADERS } from "../auth";
 
 const API = "http://localhost:8080/categories";
-
-const containerStyle = {
-  minHeight: "calc(100vh - 153px)"
-};
 
 export default class Categories extends React.Component {
   auth: Auth;
@@ -21,7 +17,21 @@ export default class Categories extends React.Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.getCategories();
+  }
+
+  getCategories() {
+    axios
+      .get(API, { headers: HTTP_HEADERS })
+      .then(categories => {
+        console.log("Categories", categories);
+        return categories;
+      })
+      .catch(error => {
+        console.log("Error while login!");
+      });
+  }
 
   render() {
     /*const { hits, isLoading, error } = this.state;
