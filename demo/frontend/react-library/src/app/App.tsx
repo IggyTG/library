@@ -44,6 +44,7 @@ export default class App extends React.Component {
                     !this.isLoggedIn() ? <Redirect to="/login" /> : <Home />
                   }
                 />
+                <Route path="/home" component={Home} />
                 <Route path="/login" component={Login} />
                 <Route path="/categories" component={Categories} />
                 <Route path="/books" component={Books} />

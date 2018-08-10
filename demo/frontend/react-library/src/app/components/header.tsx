@@ -1,7 +1,7 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
 import Auth from "../auth";
-import Logout from "./logout";
+import User from "./user";
 
 type MyState = {
   isLoggedIn: boolean;
@@ -79,28 +79,16 @@ export default class Header extends React.Component<any, MyState> {
               )}
             </ul>
             <ul className="navbar-nav ml-auto">
+              {this.state.isLoggedIn && <User />}
               {!this.state.isLoggedIn && (
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/login">
-                    Login
-                  </NavLink>
-                </li>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="is-active"
+                  to="/login"
+                >
+                  Login
+                </NavLink>
               )}
-              {this.state.isLoggedIn && (
-                <li className="nav-item dropdown">
-                  <NavLink
-                    className="nav-link dropdown-toggle"
-                    to="#"
-                    id="navbarDropdownMenuLink"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    {this.auth.getUsername()}
-                  </NavLink>
-                </li>
-              )}
-              <Logout />
             </ul>
           </div>
         </div>

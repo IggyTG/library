@@ -1,9 +1,5 @@
 import * as React from "react";
 
-const containerStyle = {
-  minHeight: "calc(100vh - 153px)"
-};
-
 export default class Home extends React.PureComponent {
   render() {
     return (
