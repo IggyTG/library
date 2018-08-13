@@ -62,7 +62,8 @@
     "react-bootstrap": "^0.32.1",
     "react-router-dom": "^4.2.2",
     "reflect-metadata": "^0.1.12",
-    "universal-cookie": "^2.2.0"
+    "universal-cookie": "^2.2.0",
+    "antd": "^3.2.2"
   },
   "postcss": {}
 }

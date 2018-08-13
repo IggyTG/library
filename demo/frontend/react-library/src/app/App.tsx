@@ -1,7 +1,7 @@
 import * as React from "react";
 import "./../assets/scss/App.scss";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Switch, Route, Redirect, Router } from "react-router-dom";
+import { Switch, Route, Redirect, withRouter } from "react-router-dom";
 import Categories from "./components/categories";
 import Auth from "./auth";
 import Header from "./components/header";
@@ -13,26 +13,43 @@ import Login from "./components/login";
 const containerStyle = {
   minHeight: "calc(100vh - 153px)"
 };
+type MyState = {
+  isAuthenticated: boolean;
+  admin: string;
+};
 
-export default class App extends React.Component {
+class App extends React.Component<any, MyState> {
+  private auth: Auth = new Auth();
+
   constructor(props) {
     super(props);
 
     this.state = {
-      isLoggedIn: false
+      isAuthenticated: false,
+      admin: ""
     };
   }
 
-  private auth: Auth = new Auth();
+  componentWillMount() {
+    this.setState({ isAuthenticated: this.auth.isAuthenticated() });
+  }
 
-  private isLoggedIn(): boolean {
-    return this.auth.isAuthenticated();
+  handleLogin() {
+    this.setState({
+      isAuthenticated: this.auth.isAuthenticated(),
+      admin: this.auth.hasRoleAdmin()
+    });
+
+    this.props.history.replace("/home");
   }
 
   render() {
     return (
       <div className="container">
-        <Header />
+        <Header
+          isAuthenticated={this.state.isAuthenticated}
+          admin={this.state.admin}
+        />
         <div className="container" style={containerStyle}>
           <div className="row">
             <div className="col">
@@ -41,11 +58,20 @@ export default class App extends React.Component {
                   exact
                   path="/"
                   render={() =>
-                    !this.isLoggedIn() ? <Redirect to="/login" /> : <Home />
+                    !this.auth.isAuthenticated() ? (
+                      <Redirect to="/login" />
+                    ) : (
+                      <Home />
+                    )
                   }
                 />
                 <Route path="/home" component={Home} />
-                <Route path="/login" component={Login} />
+                <Route
+                  path="/login"
+                  render={props => (
+                    <Login onLogin={this.handleLogin.bind(this)} {...props} />
+                  )}
+                />
                 <Route path="/categories" component={Categories} />
                 <Route path="/books" component={Books} />
               </Switch>
@@ -57,3 +83,5 @@ export default class App extends React.Component {
     );
   }
 }
+
+export default withRouter(App);

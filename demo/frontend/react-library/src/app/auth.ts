@@ -12,8 +12,6 @@ export default class Auth {
   private cookies = new Cookies();
 
   login(username: string, password: string): Promise<any> {
-    let self = this;
-
     const base64Credential = btoa(username + ":" + password);
     HTTP_HEADERS = {
       "X-Requested-With": "XMLHttpRequest",
@@ -28,7 +26,8 @@ export default class Auth {
         return user.data;
       })
       .catch(error => {
-        console.log("Error while login!");
+        console.log("Error", error);
+        return "error";
       });
   }
 

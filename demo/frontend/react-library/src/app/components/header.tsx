@@ -9,20 +9,12 @@ type MyState = {
 };
 
 export default class Header extends React.Component<any, MyState> {
+  private auth = new Auth();
+
   constructor(props) {
     super(props);
     this.state = { isLoggedIn: false, admin: false };
-    setInterval(() => this.updateStates(), 1000);
   }
-
-  updateStates() {
-    this.setState({
-      isLoggedIn: this.auth.isAuthenticated(),
-      admin: this.auth.hasRoleAdmin()
-    });
-  }
-
-  private auth = new Auth();
 
   render() {
     return (
@@ -44,7 +36,7 @@ export default class Header extends React.Component<any, MyState> {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavDropdown">
             <ul className="navbar-nav">
-              {this.state.isLoggedIn && (
+              {this.props.isAuthenticated && (
                 <li className="nav-item">
                   <NavLink
                     className="nav-link"
@@ -55,7 +47,7 @@ export default class Header extends React.Component<any, MyState> {
                   </NavLink>
                 </li>
               )}
-              {this.state.admin && (
+              {this.props.admin && (
                 <li className="nav-item">
                   <NavLink
                     className="nav-link"
@@ -66,7 +58,7 @@ export default class Header extends React.Component<any, MyState> {
                   </NavLink>
                 </li>
               )}
-              {this.state.admin && (
+              {this.props.admin && (
                 <li className="nav-item">
                   <NavLink
                     className="nav-link"
@@ -79,8 +71,8 @@ export default class Header extends React.Component<any, MyState> {
               )}
             </ul>
             <ul className="navbar-nav ml-auto">
-              {this.state.isLoggedIn && <User />}
-              {!this.state.isLoggedIn && (
+              {this.props.isAuthenticated && <User />}
+              {!this.props.isAuthenticated && (
                 <NavLink
                   className="nav-link"
                   activeClassName="is-active"

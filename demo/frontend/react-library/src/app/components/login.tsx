@@ -10,7 +10,7 @@ import {
 import { History } from "history";
 import Auth from "../auth";
 
-type MyProps = { history: History };
+type MyProps = { history: History; onLogin: Function };
 type MyState = { username: string; password: string; error: boolean };
 
 export default class Login extends React.Component<MyProps, MyState> {
@@ -25,17 +25,14 @@ export default class Login extends React.Component<MyProps, MyState> {
 
   login(event) {
     event.preventDefault();
-
-    this.auth
-      .login(this.state.username, this.state.password)
-      .then(user => {
-        console.log("Authenticated!!!");
+    this.auth.login(this.state.username, this.state.password).then(data => {
+      if (data === "error") {
+        this.setState({ error: true });
+      } else {
+        this.props.onLogin();
         this.props.history.replace("/home");
-      })
-      .catch(error => {
-        console.log("Not Authenticated!!!");
-        this.setState({ error: false });
-      });
+      }
+    });
   }
 
   updateUsername(event) {
