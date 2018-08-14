@@ -8,9 +8,9 @@ type MyState = {
   admin: boolean;
 };
 
-export default class Header extends React.Component<any, MyState> {
-  private auth = new Auth();
+type MyProps = { onLogout: Function; isAuthenticated: boolean; admin: boolean };
 
+export default class Header extends React.Component<MyProps, MyState> {
   constructor(props) {
     super(props);
     this.state = { isLoggedIn: false, admin: false };
@@ -71,7 +71,9 @@ export default class Header extends React.Component<any, MyState> {
               )}
             </ul>
             <ul className="navbar-nav ml-auto">
-              {this.props.isAuthenticated && <User />}
+              {this.props.isAuthenticated && (
+                <User onLogout={this.props.onLogout.bind(this)} />
+              )}
               {!this.props.isAuthenticated && (
                 <NavLink
                   className="nav-link"

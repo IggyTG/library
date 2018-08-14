@@ -6,7 +6,7 @@ import Categories from "./components/categories";
 import Auth from "./auth";
 import Header from "./components/header";
 import Footer from "./components/footer";
-import Home from "./components/home";
+import Home from "./components/home/home";
 import Books from "./components/books";
 import Login from "./components/login";
 
@@ -15,7 +15,7 @@ const containerStyle = {
 };
 type MyState = {
   isAuthenticated: boolean;
-  admin: string;
+  admin: boolean;
 };
 
 class App extends React.Component<any, MyState> {
@@ -26,7 +26,7 @@ class App extends React.Component<any, MyState> {
 
     this.state = {
       isAuthenticated: false,
-      admin: ""
+      admin: false
     };
   }
 
@@ -43,12 +43,22 @@ class App extends React.Component<any, MyState> {
     this.props.history.replace("/home");
   }
 
+  handleLogout() {
+    this.auth.logout();
+    this.setState({
+      isAuthenticated: false,
+      admin: false
+    });
+    this.props.history.replace("/login");
+  }
+
   render() {
     return (
       <div className="container">
         <Header
           isAuthenticated={this.state.isAuthenticated}
           admin={this.state.admin}
+          onLogout={this.handleLogout.bind(this)}
         />
         <div className="container" style={containerStyle}>
           <div className="row">

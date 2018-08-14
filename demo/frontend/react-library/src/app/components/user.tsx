@@ -4,8 +4,9 @@ import { DropdownButton, MenuItem } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 
 type MyState = { isAuthenticated: boolean };
+type MyProps = { onLogout: Function };
 
-export default class User extends React.Component<any, MyState> {
+export default class User extends React.Component<MyProps, MyState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,8 +16,7 @@ export default class User extends React.Component<any, MyState> {
   private auth = new Auth();
 
   logout() {
-    this.auth.logout();
-    this.setState({ isAuthenticated: false });
+    this.props.onLogout();
   }
 
   render() {
