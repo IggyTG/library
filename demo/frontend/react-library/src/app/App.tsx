@@ -2,7 +2,7 @@ import * as React from "react";
 import "./../assets/scss/App.scss";
 import { Switch, Route, Redirect, withRouter } from "react-router-dom";
 import Categories from "./components/categories";
-import Auth from "./auth";
+import Auth from "./services/auth";
 import Header from "./components/header";
 import Footer from "./components/footer";
 import Home from "./components/home/home";

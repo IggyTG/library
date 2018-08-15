@@ -1,9 +1,8 @@
 import * as React from "react";
 import axios from "axios";
-import Auth, { HTTP_HEADERS } from "../auth";
+import Auth, { HTTP_HEADERS } from "../services/auth";
 import { Category } from "../model/category";
-
-const API = "http://localhost:8080/categories";
+import CategoryService from "../services/categories.service";
 
 type MyState = {
   categories: Category[];
@@ -11,6 +10,7 @@ type MyState = {
 
 export default class Categories extends React.Component<any, MyState> {
   auth: Auth;
+  categoryService: CategoryService = new CategoryService();
 
   constructor(props) {
     super(props);
@@ -25,21 +25,17 @@ export default class Categories extends React.Component<any, MyState> {
   }
 
   getCategories() {
-    axios.get(API, { headers: HTTP_HEADERS }).then(response => {
-      this.setState({ categories: response.data });
+    this.categoryService.getCategories().then(response => {
+      this.setState({ categories: response });
     });
   }
 
   saveCategory(category: Category) {
-    if (category.id) {
-      return axios.put(API, category, { headers: HTTP_HEADERS });
-    } else {
-      return axios.post(API, category, { headers: HTTP_HEADERS });
-    }
+    this.categoryService.saveCategory(category);
   }
 
   deleteCategory(categoryId: number) {
-    return axios.delete(API + "/" + categoryId, { headers: HTTP_HEADERS });
+    this.categoryService.deleteCategory(categoryId);
   }
 
   render() {

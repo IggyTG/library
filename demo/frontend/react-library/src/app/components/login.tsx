@@ -8,7 +8,7 @@ import {
   Prompt
 } from "react-router-dom";
 import { History } from "history";
-import Auth from "../auth";
+import Auth from "../services/auth";
 
 type MyProps = { history: History; onLogin: Function };
 type MyState = { username: string; password: string; error: boolean };

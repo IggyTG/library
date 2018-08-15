@@ -1,4 +1,6 @@
 import * as React from "react";
+import CategoryList from "./category-list";
+import BookList from "./books-list";
 
 export default class Home extends React.PureComponent {
   render() {
@@ -32,7 +34,12 @@ export default class Home extends React.PureComponent {
           </div>
         </div>
         <div className="row">
-          <div className="col-lg-9" />
+          <div className="col-lg-9">
+            <BookList />
+          </div>
+          <div className="col-lg-3">
+            <CategoryList />
+          </div>
         </div>
       </div>
     );

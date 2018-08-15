@@ -1,6 +1,6 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import Auth from "../auth";
+import Auth from "../services/auth";
 import User from "./user";
 import { Navbar, NavItem, Nav } from "react-bootstrap";
 
