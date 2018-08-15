@@ -1,6 +1,5 @@
 import * as React from "react";
 import "./../assets/scss/App.scss";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Switch, Route, Redirect, withRouter } from "react-router-dom";
 import Categories from "./components/categories";
 import Auth from "./auth";
@@ -54,7 +53,7 @@ class App extends React.Component<any, MyState> {
 
   render() {
     return (
-      <div className="container">
+      <div>
         <Header
           isAuthenticated={this.state.isAuthenticated}
           admin={this.state.admin}

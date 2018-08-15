@@ -2,6 +2,7 @@ import * as React from "react";
 import { NavLink } from "react-router-dom";
 import Auth from "../auth";
 import User from "./user";
+import { Navbar, NavItem, Nav } from "react-bootstrap";
 
 type MyState = {
   isLoggedIn: boolean;
@@ -18,59 +19,52 @@ export default class Header extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-5">
-        <div className="container">
-          <NavLink className="navbar-brand" to="/">
-            Library
-          </NavLink>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarNavDropdown"
-            aria-controls="navbarNavDropdown"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon" />
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul className="navbar-nav">
+      <Navbar>
+        <Navbar.Header>
+          <Navbar.Brand>
+            <NavLink className="nav-link" to="/">
+              Library
+            </NavLink>
+          </Navbar.Brand>
+        </Navbar.Header>
+        <Navbar.Collapse>
+          <Nav>
+            <NavItem eventKey={1}>
               {this.props.isAuthenticated && (
-                <li className="nav-item">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="is-active"
-                    to="/home"
-                  >
-                    Home
-                  </NavLink>
-                </li>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="is-active"
+                  to="/home"
+                >
+                  Home
+                </NavLink>
               )}
+            </NavItem>
+            <NavItem eventKey={2}>
               {this.props.admin && (
-                <li className="nav-item">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="is-active"
-                    to="/categories"
-                  >
-                    Categories
-                  </NavLink>
-                </li>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="is-active"
+                  to="/categories"
+                >
+                  Categories
+                </NavLink>
               )}
+            </NavItem>
+            <NavItem eventKey={3}>
               {this.props.admin && (
-                <li className="nav-item">
-                  <NavLink
-                    className="nav-link"
-                    activeClassName="is-active"
-                    to="/books"
-                  >
-                    Books
-                  </NavLink>
-                </li>
+                <NavLink
+                  className="nav-link"
+                  activeClassName="is-active"
+                  to="/books"
+                >
+                  Books
+                </NavLink>
               )}
-            </ul>
-            <ul className="navbar-nav ml-auto">
+            </NavItem>
+          </Nav>
+          <Nav pullRight>
+            <NavItem>
               {this.props.isAuthenticated && (
                 <User onLogout={this.props.onLogout.bind(this)} />
               )}
@@ -83,10 +77,10 @@ export default class Header extends React.Component<MyProps, MyState> {
                   Login
                 </NavLink>
               )}
-            </ul>
-          </div>
-        </div>
-      </nav>
+            </NavItem>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
     );
   }
 }
