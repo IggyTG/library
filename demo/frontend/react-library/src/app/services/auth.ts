@@ -6,14 +6,12 @@ export interface User {
   roles: string[];
 }
 
-var HTTP_HEADERS;
-
 export default class Auth {
   private cookies = new Cookies();
 
   login(username: string, password: string): Promise<any> {
     const base64Credential = btoa(username + ":" + password);
-    HTTP_HEADERS = {
+    let HTTP_HEADERS = {
       "X-Requested-With": "XMLHttpRequest",
       "Content-Type": "application/json",
       Authorization: "Basic " + base64Credential
@@ -23,6 +21,7 @@ export default class Auth {
       .get("http://localhost:8080/user", { headers: HTTP_HEADERS })
       .then(user => {
         this.cookies.set("user", user.data, { path: "/" });
+        this.cookies.set("auth", HTTP_HEADERS.Authorization, { path: "/" });
         return user.data;
       })
       .catch(error => {
@@ -46,6 +45,10 @@ export default class Auth {
     }
   }
 
+  getAuth() {
+    return this.cookies.get("auth");
+  }
+
   hasRoleAdmin() {
     let user = this.getUser();
     if (user) {
@@ -57,5 +60,3 @@ export default class Auth {
     this.cookies.remove("user", { path: "/" });
   }
 }
-
-export { HTTP_HEADERS };

@@ -1,6 +1,6 @@
 import * as React from "react";
 import axios from "axios";
-import Auth, { HTTP_HEADERS } from "../services/auth";
+import Auth from "../services/auth";
 import { Category } from "../model/category";
 import CategoryService from "../services/categories.service";
 

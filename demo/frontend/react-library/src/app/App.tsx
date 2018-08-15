@@ -25,7 +25,7 @@ class App extends React.Component<any, MyState> {
 
     this.state = {
       isAuthenticated: false,
-      admin: false
+      admin: this.auth.hasRoleAdmin()
     };
   }
 
