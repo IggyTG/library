@@ -1,41 +1,58 @@
 import * as React from "react";
-import CategoryService from "../../services/categories.service";
 import { Category } from "../../model/category";
+import { Button } from "react-bootstrap";
+import { BtnCategory } from "./btn-category";
 
-type MyState = {
-  selected: string;
+type MyProps = {
+  onCategoryPress: Function;
   categories: Category[];
+  buttons: BtnCategory[];
+  isLoaded: boolean;
 };
 
-type MyProps = {};
+type MyState = {
+  buttons: BtnCategory[];
+};
 
-export default class CategoryList extends React.Component<any, MyState> {
-  categoryService: CategoryService = new CategoryService();
-
+export default class CategoryList extends React.Component<MyProps, MyState> {
   constructor(props) {
     super(props);
 
+    this.setFilter = this.setFilter.bind(this);
+    this.getButtonClass = this.getButtonClass.bind(this);
+
     this.state = {
-      selected: "",
-      categories: []
+      buttons: this.props.buttons
     };
   }
 
-  componentDidMount() {
-    this.categoryService.getCategories().then(response => {
-      this.setState({ categories: response });
-    });
+  setFilter(filter: number) {
+    let btnList = this.state.buttons;
+    //change current active
+    for (let i in btnList) {
+      let btn = btnList[i];
+      if (btn.isActive && btn.categoryId != filter) {
+        btn.isActive = false;
+        btnList[i] = btn;
+      }
+    }
+    //change clicked button active
+    for (let i in btnList) {
+      let btn = btnList[i];
+      if (btn.categoryId == filter) {
+        btn.isActive = true;
+        btnList[i] = btn;
+        break;
+      }
+    }
+    this.setState({ buttons: btnList });
+    this.props.onCategoryPress(filter);
   }
 
-  setFilter(filter: string) {
-    this.setState({ selected: filter });
-    this.props.onChangeFilter(filter);
-  }
-
-  isActive(value: string) {
+  private getButtonClass(isActive: boolean) {
     return (
       "btn btn-outline-secondary list-group-item " +
-      (value === this.state.selected ? "active" : "default")
+      (isActive ? "active" : "default")
     );
   }
 
@@ -44,25 +61,22 @@ export default class CategoryList extends React.Component<any, MyState> {
       <div className="row">
         <div className="col">
           <div className="list-group mb-4 mt-3 mt-lg-0">
-            <button
-              type="button"
-              className="btn btn-outline-secondary list-group-item active"
-              onClick={() => this.setFilter("all")}
+            <Button
+              className={this.getButtonClass(this.state.buttons[0].isActive)}
+              onClick={() => this.setFilter(0)}
             >
               All
-            </button>
-            {this.state.categories.map(function(
-              category: Category,
-              index: number
-            ) {
+            </Button>
+            {this.props.categories.map((category: Category, index: number) => {
               return (
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary list-group-item default"
-                  onClick={() => this.setFilter(category.name)}
+                <Button
+                  className={this.getButtonClass(
+                    this.state.buttons[index + 1].isActive
+                  )}
+                  onClick={() => this.setFilter(category.id)}
                 >
                   {category.name}
-                </button>
+                </Button>
               );
             })}
           </div>

@@ -1,8 +1,79 @@
 import * as React from "react";
 import CategoryList from "./category-list";
 import BookList from "./books-list";
+import { Category } from "../../model/category";
+import BookService from "../../services/book.service";
+import CategoryService from "../../services/categories.service";
+import { Book } from "../../model/book";
+import { BtnCategory } from "./btn-category";
 
-export default class Home extends React.PureComponent {
+type MyState = {
+  categories: Category[];
+  categoryId: number;
+  books: Book[];
+  allBooks: Book[];
+  buttons: BtnCategory[];
+  isLoaded: boolean;
+};
+
+export default class Home extends React.Component<any, MyState> {
+  bookService: BookService = new BookService();
+  categoryService: CategoryService = new CategoryService();
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      categories: [],
+      books: [],
+      allBooks: [],
+      categoryId: 0,
+      buttons: [],
+      isLoaded: false
+    };
+  }
+
+  componentDidMount() {
+    this.categoryService.getCategories().then(response => {
+      this.setState({ categories: response });
+      this.setButtons();
+    });
+    this.bookService.getBooks().then(response => {
+      this.setState({ books: response, allBooks: response, isLoaded: true });
+    });
+  }
+
+  handleCategoryPress(categoryId: number) {
+    this.setState({ categoryId: categoryId });
+    this.filterBooks(categoryId);
+  }
+
+  private filterBooks(categoryId: number) {
+    let tmpBooks = this.state.allBooks;
+    if (categoryId === 0) {
+      this.setState({
+        books: this.state.allBooks
+      });
+    } else {
+      this.setState({
+        books: tmpBooks.filter(book => book.category.id === categoryId)
+      });
+    }
+  }
+
+  private setButtons() {
+    let buttons: BtnCategory[] = [];
+    //add default btn
+    let allBtn = new BtnCategory(0, true);
+    buttons.push(allBtn);
+    for (let index in this.state.categories) {
+      let category = this.state.categories[index];
+      let btn = new BtnCategory(category.id, false);
+      buttons.push(btn);
+    }
+    this.setState({ buttons: buttons });
+  }
+
   render() {
     return (
       <div className="row">
@@ -33,14 +104,21 @@ export default class Home extends React.PureComponent {
             </div>
           </div>
         </div>
-        <div className="row">
-          <div className="col-lg-9">
-            <BookList />
+        {this.state.isLoaded && (
+          <div className="row">
+            <div className="col-lg-9">
+              <BookList books={this.state.books} />
+            </div>
+            <div className="col-lg-3">
+              <CategoryList
+                categories={this.state.categories}
+                buttons={this.state.buttons}
+                onCategoryPress={this.handleCategoryPress.bind(this)}
+                isLoaded={this.state.isLoaded}
+              />
+            </div>
           </div>
-          <div className="col-lg-3">
-            <CategoryList />
-          </div>
-        </div>
+        )}
       </div>
     );
   }

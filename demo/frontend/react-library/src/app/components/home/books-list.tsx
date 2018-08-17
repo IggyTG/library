@@ -1,40 +1,14 @@
 import * as React from "react";
 import { Book } from "../../model/book";
-import BookService from "../../services/book.service";
+const PlaceholderImage = require("../../../assets/img/placeholder.jpg");
 
-type MyState = {
-  selected: string;
+type MyProp = {
   books: Book[];
 };
 
-export default class BookListList extends React.Component<any, MyState> {
-  bookService: BookService = new BookService();
-
+export default class BookListList extends React.Component<MyProp, null> {
   constructor(props) {
     super(props);
-
-    this.state = {
-      selected: "",
-      books: []
-    };
-  }
-
-  componentDidMount() {
-    this.bookService.getBooks().then(response => {
-      this.setState({ books: response });
-    });
-  }
-
-  setFilter(filter: string) {
-    this.setState({ selected: filter });
-    this.props.onChangeFilter(filter);
-  }
-
-  isActive(value: string) {
-    return (
-      "btn btn-outline-secondary list-group-item " +
-      (value === this.state.selected ? "active" : "default")
-    );
   }
 
   render() {
@@ -63,7 +37,7 @@ export default class BookListList extends React.Component<any, MyState> {
                 </tr>
               </thead>
               <tbody>
-                {this.state.books.map(function(book: Book, index: number) {
+                {this.props.books.map(function(book: Book, index: number) {
                   return (
                     <tr>
                       <th scope="row" className="text-center align-middle">
@@ -72,7 +46,7 @@ export default class BookListList extends React.Component<any, MyState> {
                       <td className="text-center align-middle">{book.title}</td>
                       <td className="text-center align-middle">
                         <img
-                          src="assets/images/placeholder.jpg"
+                          src={PlaceholderImage}
                           alt="placeholder"
                           className="img-thumbnail"
                         />
