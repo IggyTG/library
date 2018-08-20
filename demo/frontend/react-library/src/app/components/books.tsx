@@ -15,9 +15,11 @@ import CategoryService from "../services/categories.service";
 type MyState = {
   book: Book;
   books: Book[];
+  category: Category;
   categories: Category[];
   deleteShow: boolean;
   addShow: boolean;
+  operation: string;
 };
 
 export default class Books extends React.Component<any, MyState> {
@@ -28,10 +30,12 @@ export default class Books extends React.Component<any, MyState> {
     super(props);
     this.state = {
       book: new Book(null, null, null, null, null, null),
+      category: new Category(null, null),
       deleteShow: false,
       addShow: false,
       books: [],
-      categories: []
+      categories: [],
+      operation: ""
     };
   }
 
@@ -53,10 +57,20 @@ export default class Books extends React.Component<any, MyState> {
     this.setState({ books: this.state.books.filter(obj => obj !== book) });
   }
 
-  handleSaveBook(book) {
+  handleSaveBook(book: Book) {
     this.bookService.saveBook(book);
     this.handleAddClose();
-    this.setState({ books: this.state.books, book });
+    this.setState({ books: this.state.books.concat(book)})
+  }
+
+  handleUpdateBook(book: Book) {
+    this.bookService.updateBook(book);
+    this.handleAddClose();
+
+    let booksCopy = this.state.books.slice();
+    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id)
+    booksCopy[bookIndex] = book;
+    this.setState({books: booksCopy});
   }
 
   handleDeleteClose() {
@@ -74,33 +88,43 @@ export default class Books extends React.Component<any, MyState> {
     this.setState({ addShow: false });
   }
 
-  handleAddShow() {
-    this.setState({
-      addShow: true,
-      book: new Book(null, null, null, null, null, null)
-    });
-  }
-
-  handleChange(event, objectProp) {
-    let newBook = this.state.book;
-    if (objectProp === "category") {
-      let categoryProp = new Category(event.target.value, null);
-      newBook[objectProp] = categoryProp;
+  handleAddShow(book: Book) {
+    if (book === null) {
+      this.setState({
+        addShow: true,
+        book: new Book(null, null, null, null, null, null),
+        category: new Category(null, null),
+        operation: "Add"
+      });
     } else {
-      newBook[objectProp] = event.target.value;
+      this.setState({
+        addShow: true,
+        book: book,
+        category: book.category,
+        operation: "Edit"
+      });
     }
-
-    this.setState({ book: newBook });
   }
 
   handleSubmit(event) {
-    //event.preventDefault();
-    const form = event.target;
-    const data = new FormData(form);
+    event.preventDefault();
+    const newBook = Object.assign({}, this.state.book);
+    const formData: any = new FormData(event.target)
+    formData.forEach((value, name) => {
+      if (name === "category") {
+        let category: Category = this.state.categories.find(category =>
+          Number(value) === category.id);
+        newBook[name] = category;
+      } else {
+        newBook[name] = value;
+      }
+    });
 
-    this.handleSaveBook(data);
-
-    console.log(data);
+    if (this.state.operation === "Add")  {
+      this.handleSaveBook(newBook);
+    } else {
+      this.handleUpdateBook(newBook);
+    }
   }
 
   componentDidMount() {
@@ -144,36 +168,39 @@ export default class Books extends React.Component<any, MyState> {
                   </tr>
                 </thead>
                 <tbody>
-                  {this.state.books.map((books: Book, index: number) => {
+                  {this.state.books.map((book: Book, index: number) => {
                     return (
                       <tr>
                         <th scope="row" className="text-center align-middle">
                           {index + 1}
                         </th>
                         <td className="text-center align-middle">
-                          {books.category.name}
+                          {book.category.name}
                         </td>
                         <td className="text-center align-middle">
-                          {books.isbn}
+                          {book.isbn}
                         </td>
                         <td className="text-center align-middle">
-                          {books.title}
+                          {book.title}
                         </td>
                         <td className="text-center align-middle">
-                          {books.author}
+                          {book.author}
                         </td>
                         <td className="text-center align-middle">
-                          {books.publishDate}
+                          {book.publishDate}
                         </td>
                         <td className="text-center align-middle">
-                          <Button className="btn btn-outline-secondary">
+                          <Button
+                            className="btn btn-primary mr-2"
+                            onClick={()=> this.handleAddShow(book)}
+                          >
                             Edit
                           </Button>
                         </td>
                         <td className="text-center align-middle">
                           <Button
                             className="btn btn-danger"
-                            onClick={() => this.handleDeleteShow(books)}
+                            onClick={() => this.handleDeleteShow(book)}
                           >
                             Delete
                           </Button>
@@ -188,14 +215,12 @@ export default class Books extends React.Component<any, MyState> {
         </div>
         <div className="row">
           <div className="col">
-            <div className="float-right">
               <Button
-                className="btn btn-primary mr-2"
-                onClick={() => this.handleAddShow()}
+                className="btn btn-primary mr-2 pull-right"
+                onClick={()=> this.handleAddShow(null)}
               >
                 Add Book
               </Button>
-            </div>
           </div>
         </div>
 
@@ -233,21 +258,20 @@ export default class Books extends React.Component<any, MyState> {
         <div>
           <Modal show={this.state.addShow} onHide={() => this.handleAddClose()}>
             <Modal.Header closeButton>
-              <Modal.Title>Add Book</Modal.Title>
+              <Modal.Title>{this.state.operation}</Modal.Title>
             </Modal.Header>
-            <Form>
+            <Form onSubmit={(event)=> this.handleSubmit(event)}>
               <Modal.Body>
                 <FormGroup>
                   <ControlLabel>Category</ControlLabel>
                   <FormControl
                     componentClass="select"
-                    defaultValue={0}
+                    defaultValue={this.state.category.id || ""}
                     id="category"
                     name="category"
-                    //onChange={event => this.handleChange(event, "category")}
                     required
                   >
-                    <option value={0} disabled>
+                    <option value={""} disabled>
                       Please select category
                     </option>
                     {this.state.categories.map((category: Category) => {
@@ -263,7 +287,7 @@ export default class Books extends React.Component<any, MyState> {
                     type="text"
                     id="title"
                     name="title"
-                    //onChange={event => this.handleChange(event, "title")}
+                    defaultValue={this.state.book.title}
                     required
                   />
                 </FormGroup>
@@ -273,7 +297,7 @@ export default class Books extends React.Component<any, MyState> {
                     type="text"
                     id="author"
                     name="author"
-                    //onChange={event => this.handleChange(event, "author")}
+                    defaultValue={this.state.book.author}
                     required
                   />
                 </FormGroup>
@@ -283,7 +307,7 @@ export default class Books extends React.Component<any, MyState> {
                     type="date"
                     id="publishDate"
                     name="publishDate"
-                    //onChange={event => this.handleChange(event, "publishDate")}
+                    defaultValue={this.state.book.publishDate}
                     required
                   />
                 </FormGroup>
@@ -293,7 +317,7 @@ export default class Books extends React.Component<any, MyState> {
                     type="text"
                     id="isbn"
                     name="isbn"
-                    //onChange={event => this.handleChange(event, "isbn")}
+                    defaultValue={this.state.book.isbn}
                     required
                   />
                 </FormGroup>

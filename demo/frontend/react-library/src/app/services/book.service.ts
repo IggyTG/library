@@ -40,7 +40,7 @@ export default class BookService {
 
   updateBook(book: Book) {
     return axios
-      .put(API + "/" + book.id, book, { headers: this.HTTP_HEADERS })
+      .put(API, book, { headers: this.HTTP_HEADERS })
       .then(result => {
         return result.data;
       });
