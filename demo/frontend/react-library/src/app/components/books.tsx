@@ -10,7 +10,7 @@ import {
   Form
 } from "react-bootstrap";
 import BookService from "../services/book.service";
-import CategoryService from "../services/categories.service";
+import CategoryService from "../services/category.service";
 
 type MyState = {
   book: Book;
@@ -60,7 +60,7 @@ export default class Books extends React.Component<any, MyState> {
   handleSaveBook(book: Book) {
     this.bookService.saveBook(book);
     this.handleAddClose();
-    this.setState({ books: this.state.books.concat(book)})
+    this.setState({ books: this.state.books.concat(book) });
   }
 
   handleUpdateBook(book: Book) {
@@ -68,9 +68,9 @@ export default class Books extends React.Component<any, MyState> {
     this.handleAddClose();
 
     let booksCopy = this.state.books.slice();
-    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id)
+    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id);
     booksCopy[bookIndex] = book;
-    this.setState({books: booksCopy});
+    this.setState({ books: booksCopy });
   }
 
   handleDeleteClose() {
@@ -109,18 +109,19 @@ export default class Books extends React.Component<any, MyState> {
   handleSubmit(event) {
     event.preventDefault();
     const newBook = Object.assign({}, this.state.book);
-    const formData: any = new FormData(event.target)
+    const formData: any = new FormData(event.target);
     formData.forEach((value, name) => {
       if (name === "category") {
-        let category: Category = this.state.categories.find(category =>
-          Number(value) === category.id);
+        let category: Category = this.state.categories.find(
+          category => Number(value) === category.id
+        );
         newBook[name] = category;
       } else {
         newBook[name] = value;
       }
     });
 
-    if (this.state.operation === "Add")  {
+    if (this.state.operation === "Add") {
       this.handleSaveBook(newBook);
     } else {
       this.handleUpdateBook(newBook);
@@ -192,7 +193,7 @@ export default class Books extends React.Component<any, MyState> {
                         <td className="text-center align-middle">
                           <Button
                             className="btn btn-primary mr-2"
-                            onClick={()=> this.handleAddShow(book)}
+                            onClick={() => this.handleAddShow(book)}
                           >
                             Edit
                           </Button>
@@ -215,12 +216,12 @@ export default class Books extends React.Component<any, MyState> {
         </div>
         <div className="row">
           <div className="col">
-              <Button
-                className="btn btn-primary mr-2 pull-right"
-                onClick={()=> this.handleAddShow(null)}
-              >
-                Add Book
-              </Button>
+            <Button
+              className="btn btn-primary mr-2 pull-right"
+              onClick={() => this.handleAddShow(null)}
+            >
+              Add Book
+            </Button>
           </div>
         </div>
 
@@ -260,7 +261,7 @@ export default class Books extends React.Component<any, MyState> {
             <Modal.Header closeButton>
               <Modal.Title>{this.state.operation}</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(event)=> this.handleSubmit(event)}>
+            <Form onSubmit={event => this.handleSubmit(event)}>
               <Modal.Body>
                 <FormGroup>
                   <ControlLabel>Category</ControlLabel>

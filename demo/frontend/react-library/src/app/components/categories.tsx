@@ -1,11 +1,22 @@
 import * as React from "react";
-import axios from "axios";
+import {
+  Modal,
+  Button,
+  ControlLabel,
+  FormGroup,
+  FormControl,
+  Form
+} from "react-bootstrap";
 import Auth from "../services/auth";
 import { Category } from "../model/category";
-import CategoryService from "../services/categories.service";
+import CategoryService from "../services/category.service";
 
 type MyState = {
+  category: Category;
   categories: Category[];
+  deleteShow: boolean;
+  addShow: boolean;
+  operation: string;
 };
 
 export default class Categories extends React.Component<any, MyState> {
@@ -16,7 +27,11 @@ export default class Categories extends React.Component<any, MyState> {
     super(props);
 
     this.state = {
-      categories: []
+      categories: [],
+      category: new Category(null, null),
+      deleteShow: false,
+      addShow: false,
+      operation: ""
     };
   }
 
@@ -30,188 +45,230 @@ export default class Categories extends React.Component<any, MyState> {
     });
   }
 
-  saveCategory(category: Category) {
-    this.categoryService.saveCategory(category);
+  handleGetCategories() {
+    this.categoryService.getCategories().then(response => {
+      this.setState({ categories: response });
+    });
   }
 
-  deleteCategory(categoryId: number) {
-    this.categoryService.deleteCategory(categoryId);
+  handleDeleteCategory(category: Category) {
+    this.categoryService.deleteCategory(category.id);
+    this.handleDeleteClose();
+    this.setState({
+      categories: this.state.categories.filter(obj => obj !== category)
+    });
+  }
+
+  handleSaveCategory(category: Category) {
+    this.categoryService.saveCategory(category).then(category => {
+      this.setState({ categories: this.state.categories.concat(category) });
+    });
+    this.handleAddClose();
+  }
+
+  handleUpdateCategory(category: Category) {
+    this.categoryService.updateCategory(category);
+    this.handleAddClose();
+
+    let categoriesCopy = this.state.categories.slice();
+    let categoryIndex = categoriesCopy.findIndex(
+      categoryCopy => categoryCopy.id === category.id
+    );
+    categoriesCopy[categoryIndex] = category;
+    this.setState({ categories: categoriesCopy });
+  }
+
+  handleDeleteClose() {
+    this.setState({ deleteShow: false });
+  }
+
+  handleDeleteShow(category: Category) {
+    this.setState({
+      deleteShow: true,
+      category: category
+    });
+  }
+
+  handleAddClose() {
+    this.setState({ addShow: false });
+  }
+
+  handleAddShow(category: Category) {
+    if (category === null) {
+      this.setState({
+        addShow: true,
+        category: new Category(null, null),
+        operation: "Add"
+      });
+    } else {
+      this.setState({
+        addShow: true,
+        category: category,
+        operation: "Edit"
+      });
+    }
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const newCategory = Object.assign({}, this.state.category);
+    const formData: any = new FormData(event.target);
+    formData.forEach((value, name) => {
+      if (name === "category") {
+        let category: Category = this.state.categories.find(
+          category => Number(value) === category.id
+        );
+        newCategory[name] = category;
+      } else {
+        newCategory[name] = value;
+      }
+    });
+
+    if (this.state.operation === "Add") {
+      this.handleSaveCategory(newCategory);
+    } else {
+      this.handleUpdateCategory(newCategory);
+    }
   }
 
   render() {
     return (
-      <div className="container">
-        <div className="row">
-          <div className="col">
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col" className="text-center align-middle">
-                      #
-                    </th>
-                    <th scope="col" className="text-center align-middle">
-                      Category
-                    </th>
-                    <th scope="col" className="text-center align-middle">
-                      Edit
-                    </th>
-                    <th scope="col" className="text-center align-middle">
-                      Delete
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {this.state.categories.map(function(
-                    category: Category,
-                    index: number
-                  ) {
-                    return (
-                      <tr>
-                        <th scope="row" className="text-center align-middle">
-                          {index + 1}
-                        </th>
-                        <td className="text-center align-middle">
-                          {category.name}
-                        </td>
-                        <td className="text-center align-middle">
-                          <button
-                            className="btn btn-outline-secondary"
-                            data-toggle="modal"
-                            data-target="#saveCategoryModal"
-                          >
-                            Edit
-                          </button>
-                        </td>
-                        <td className="text-center align-middle">
-                          <span className="d-inline-block">
-                            <button
-                              className="btn btn-danger"
-                              data-toggle="modal"
-                              data-target="#deleteCategoryModal"
+      <React.Fragment>
+        <div className="container">
+          <div className="row">
+            <div className="col">
+              <div className="table-responsive">
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" className="text-center align-middle">
+                        #
+                      </th>
+                      <th scope="col" className="text-center align-middle">
+                        Category
+                      </th>
+                      <th scope="col" className="text-center align-middle">
+                        Edit
+                      </th>
+                      <th scope="col" className="text-center align-middle">
+                        Delete
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.state.categories.map(
+                      (category: Category, index: number) => {
+                        return (
+                          <tr>
+                            <th
+                              scope="row"
+                              className="text-center align-middle"
                             >
-                              Delete
-                            </button>
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                              {index + 1}
+                            </th>
+                            <td className="text-center align-middle">
+                              {category.name}
+                            </td>
+                            <td className="text-center align-middle">
+                              <Button
+                                className="btn btn-primary mr-2"
+                                onClick={() => this.handleAddShow(category)}
+                              >
+                                Edit
+                              </Button>
+                            </td>
+                            <td className="text-center align-middle">
+                              <Button
+                                className="btn btn-danger"
+                                onClick={() => this.handleDeleteShow(category)}
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      }
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="row">
-          <div className="col">
-            <div className="float-right">
-              <button
-                className="btn btn-primary mr-2"
-                data-toggle="modal"
-                data-target="#saveCategoryModal"
+          <div className="row">
+            <div className="col">
+              <Button
+                className="btn btn-primary mr-2 pull-right"
+                onClick={() => this.handleAddShow(null)}
               >
                 Add Category
-              </button>
-            </div>
-          </div>
-        </div>
-        <div
-          className="modal fade"
-          id="deleteCategoryModal"
-          role="dialog"
-          aria-labelledby="deleteCategoryModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="deleteCategoryModalLabel">
-                  Delete Category
-                </h5>
-                <button
-                  className="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div className="modal-body">
-                <p>
-                  Do you want to delete <i>selectedCategory.name</i> ?
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" data-dismiss="modal">
-                  Close
-                </button>
-                <button className="btn btn-primary" data-dismiss="modal">
-                  Submit
-                </button>
-              </div>
+              </Button>
             </div>
           </div>
         </div>
 
-        <div
-          className="modal fade"
-          id="saveCategoryModal"
-          role="dialog"
-          aria-labelledby="saveCategoryModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="saveCategoryModalLabel">
-                  Category
-                </h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <form>
-                <div className="modal-body">
-                  <div className="row">
-                    <div className="col">
-                      <div className="form-group">
-                        <label htmlFor="category">Name</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="name"
-                          name="name"
-                        />
-                        <div className="invalid-feedback">
-                          Please enter category name!
-                        </div>
-                        <div className="invalid-feedback">error.name</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-dismiss="modal"
-                  >
-                    Close
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        {/* Delete Modal */}
+        <div>
+          <Modal
+            show={this.state.deleteShow}
+            onHide={() => this.handleDeleteClose()}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Delete Category</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              Do you want to delete <i>{this.state.category.name}</i>?
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                className="btn btn-secondary"
+                onClick={() => this.handleDeleteClose()}
+              >
+                Close
+              </Button>
+              <Button
+                className="btn btn-primary"
+                onClick={() => this.handleDeleteCategory(this.state.category)}
+              >
+                Submit
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
-      </div>
+
+        {/* Save Modal */}
+        <div>
+          <Modal show={this.state.addShow} onHide={() => this.handleAddClose()}>
+            <Modal.Header closeButton>
+              <Modal.Title>{this.state.operation} Category</Modal.Title>
+            </Modal.Header>
+            <Form onSubmit={event => this.handleSubmit(event)}>
+              <Modal.Body>
+                <FormGroup>
+                  <ControlLabel>Name</ControlLabel>
+                  <FormControl
+                    defaultValue={this.state.category.name}
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                  />
+                </FormGroup>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  className="btn btn-secondary"
+                  onClick={() => this.handleAddClose()}
+                >
+                  Close
+                </Button>
+                <Button type="submit" className="btn btn-primary">
+                  Submit
+                </Button>
+              </Modal.Footer>
+            </Form>
+          </Modal>
+        </div>
+      </React.Fragment>
     );
   }
 }
