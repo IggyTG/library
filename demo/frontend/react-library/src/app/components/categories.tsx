@@ -17,6 +17,7 @@ type MyState = {
   deleteShow: boolean;
   addShow: boolean;
   operation: string;
+  error: string;
 };
 
 export default class Categories extends React.Component<any, MyState> {
@@ -31,7 +32,8 @@ export default class Categories extends React.Component<any, MyState> {
       category: new Category(null, null),
       deleteShow: false,
       addShow: false,
-      operation: ""
+      operation: "",
+      error: ""
     };
   }
 
@@ -60,22 +62,31 @@ export default class Categories extends React.Component<any, MyState> {
   }
 
   handleSaveCategory(category: Category) {
-    this.categoryService.saveCategory(category).then(category => {
-      this.setState({ categories: this.state.categories.concat(category) });
+    this.categoryService.saveCategory(category).then(response => {
+      if (!response.error) {
+        this.setState({ categories: this.state.categories.concat(response) });
+        this.handleAddClose();
+      } else {
+        this.setState({ error: response.error });
+      }
     });
-    this.handleAddClose();
   }
 
   handleUpdateCategory(category: Category) {
-    this.categoryService.updateCategory(category);
-    this.handleAddClose();
+    this.categoryService.updateCategory(category).then(response => {
+      if (!response.error) {
+        this.handleAddClose();
 
-    let categoriesCopy = this.state.categories.slice();
-    let categoryIndex = categoriesCopy.findIndex(
-      categoryCopy => categoryCopy.id === category.id
-    );
-    categoriesCopy[categoryIndex] = category;
-    this.setState({ categories: categoriesCopy });
+        let categoriesCopy = this.state.categories.slice();
+        let categoryIndex = categoriesCopy.findIndex(
+          categoryCopy => categoryCopy.id === category.id
+        );
+        categoriesCopy[categoryIndex] = category;
+        this.setState({ categories: categoriesCopy });
+      } else {
+        this.setState({ error: response.error });
+      }
+    });
   }
 
   handleDeleteClose() {
@@ -90,7 +101,7 @@ export default class Categories extends React.Component<any, MyState> {
   }
 
   handleAddClose() {
-    this.setState({ addShow: false });
+    this.setState({ addShow: false, error: "" });
   }
 
   handleAddShow(category: Category) {
@@ -253,6 +264,9 @@ export default class Categories extends React.Component<any, MyState> {
                     required
                   />
                 </FormGroup>
+                {this.state.error !== "" && (
+                  <div className="invalid-feedback">{this.state.error}</div>
+                )}
               </Modal.Body>
               <Modal.Footer>
                 <Button

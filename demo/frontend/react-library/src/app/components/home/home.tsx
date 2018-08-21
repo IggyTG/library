@@ -34,12 +34,17 @@ export default class Home extends React.Component<any, MyState> {
   }
 
   componentDidMount() {
-    this.categoryService.getCategories().then(response => {
-      this.setState({ categories: response });
-      this.setButtons();
-    });
+    this.categoryService
+      .getCategories()
+      .then(response => {
+        this.setState({ categories: response });
+        this.setButtons();
+      })
+      .then(() => {
+        this.setState({ isLoaded: true });
+      });
     this.bookService.getBooks().then(response => {
-      this.setState({ books: response, allBooks: response, isLoaded: true });
+      this.setState({ books: response, allBooks: response });
     });
   }
 
