@@ -1,6 +1,5 @@
 import * as React from "react";
 import { NavLink } from "react-router-dom";
-import Auth from "../services/auth";
 import User from "./user";
 import { Navbar, NavItem, Nav } from "react-bootstrap";
 
@@ -11,6 +10,16 @@ type MyState = {
 
 type MyProps = { onLogout: Function; isAuthenticated: boolean; admin: boolean };
 
+const linkStyle = {
+  textDecoration: "none",
+  color: "gray"
+};
+
+const activeLinkStyle = {
+  textDecoration: "none",
+  color: "black"
+};
+
 export default class Header extends React.Component<MyProps, MyState> {
   constructor(props) {
     super(props);
@@ -19,65 +28,65 @@ export default class Header extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <Navbar>
+      <Navbar activeKey={1}>
         <Navbar.Header>
           <Navbar.Brand>
-            <NavLink className="nav-link" to="/">
-              Library
-            </NavLink>
+            <NavLink to="/">Library</NavLink>
           </Navbar.Brand>
         </Navbar.Header>
         <Navbar.Collapse>
           <Nav>
-            <NavItem eventKey={1}>
-              {this.props.isAuthenticated && (
+            {this.props.isAuthenticated && (
+              <NavItem eventKey={1}>
                 <NavLink
-                  className="nav-link"
-                  activeClassName="is-active"
+                  style={linkStyle}
+                  activeStyle={activeLinkStyle}
                   to="/home"
                 >
                   Home
                 </NavLink>
-              )}
-            </NavItem>
-            <NavItem eventKey={2}>
-              {this.props.admin && (
+              </NavItem>
+            )}
+            {this.props.isAuthenticated && (
+              <NavItem eventKey={2}>
                 <NavLink
-                  className="nav-link"
-                  activeClassName="is-active"
+                  style={linkStyle}
+                  activeStyle={activeLinkStyle}
                   to="/categories"
                 >
                   Categories
                 </NavLink>
-              )}
-            </NavItem>
-            <NavItem eventKey={3}>
-              {this.props.admin && (
+              </NavItem>
+            )}
+            {this.props.isAuthenticated && (
+              <NavItem eventKey={3}>
                 <NavLink
-                  className="nav-link"
-                  activeClassName="is-active"
+                  style={linkStyle}
+                  activeStyle={activeLinkStyle}
                   to="/books"
                 >
                   Books
                 </NavLink>
-              )}
-            </NavItem>
+              </NavItem>
+            )}
           </Nav>
           <Nav pullRight>
-            <NavItem>
-              {this.props.isAuthenticated && (
+            {this.props.isAuthenticated && (
+              <NavItem>
                 <User onLogout={this.props.onLogout.bind(this)} />
-              )}
-              {!this.props.isAuthenticated && (
+              </NavItem>
+            )}
+            {!this.props.isAuthenticated && (
+              <NavItem>
                 <NavLink
-                  className="nav-link"
-                  activeClassName="is-active"
+                  style={linkStyle}
+                  activeStyle={activeLinkStyle}
                   to="/login"
                 >
                   Login
                 </NavLink>
-              )}
-            </NavItem>
+              </NavItem>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>

@@ -5,7 +5,8 @@ import {
   ControlLabel,
   FormGroup,
   FormControl,
-  Form
+  Form,
+  HelpBlock
 } from "react-bootstrap";
 import Auth from "../services/auth";
 import { Category } from "../model/category";
@@ -254,7 +255,9 @@ export default class Categories extends React.Component<any, MyState> {
             </Modal.Header>
             <Form onSubmit={event => this.handleSubmit(event)}>
               <Modal.Body>
-                <FormGroup>
+                <FormGroup
+                  validationState={this.state.error !== "" ? "error" : null}
+                >
                   <ControlLabel>Name</ControlLabel>
                   <FormControl
                     defaultValue={this.state.category.name}
@@ -263,10 +266,8 @@ export default class Categories extends React.Component<any, MyState> {
                     name="name"
                     required
                   />
+                  <HelpBlock>{this.state.error}</HelpBlock>
                 </FormGroup>
-                {this.state.error !== "" && (
-                  <div className="invalid-feedback">{this.state.error}</div>
-                )}
               </Modal.Body>
               <Modal.Footer>
                 <Button

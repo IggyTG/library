@@ -100,7 +100,7 @@ export default class Home extends React.Component<any, MyState> {
               <p className="lead">
                 <a
                   className="btn btn-primary btn-lg"
-                  href="https://github.com/sjovic/library"
+                  href="https://github.com/IggyTG/library/"
                   role="button"
                 >
                   Learn more
