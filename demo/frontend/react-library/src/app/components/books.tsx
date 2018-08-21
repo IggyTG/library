@@ -37,6 +37,11 @@ export default class Books extends React.Component<any, MyState> {
       categories: [],
       operation: ""
     };
+
+    this.formatDate = this.formatDate.bind(this);
+    this.handleDeleteClose = this.handleDeleteClose.bind(this);
+    this.handleAddClose = this.handleAddClose.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleGetCategories() {
@@ -51,16 +56,20 @@ export default class Books extends React.Component<any, MyState> {
     });
   }
 
-  handleDeleteBooks(book: Book) {
+  handleDeleteBook(book: Book) {
     this.bookService.deleteBook(book.id);
     this.handleDeleteClose();
     this.setState({ books: this.state.books.filter(obj => obj !== book) });
   }
 
   handleSaveBook(book: Book) {
-    this.bookService.saveBook(book);
+    this.bookService.saveBook(book).then(newBook => {
+      newBook.publishDate = this.formatDate(newBook.publishDate);
+      this.setState({
+        books: this.state.books.concat(newBook)
+      });
+    });
     this.handleAddClose();
-    this.setState({ books: this.state.books.concat(book)})
   }
 
   handleUpdateBook(book: Book) {
@@ -68,9 +77,9 @@ export default class Books extends React.Component<any, MyState> {
     this.handleAddClose();
 
     let booksCopy = this.state.books.slice();
-    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id)
+    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id);
     booksCopy[bookIndex] = book;
-    this.setState({books: booksCopy});
+    this.setState({ books: booksCopy });
   }
 
   handleDeleteClose() {
@@ -109,22 +118,27 @@ export default class Books extends React.Component<any, MyState> {
   handleSubmit(event) {
     event.preventDefault();
     const newBook = Object.assign({}, this.state.book);
-    const formData: any = new FormData(event.target)
+    const formData: any = new FormData(event.target);
     formData.forEach((value, name) => {
       if (name === "category") {
-        let category: Category = this.state.categories.find(category =>
-          Number(value) === category.id);
+        let category: Category = this.state.categories.find(
+          category => Number(value) === category.id
+        );
         newBook[name] = category;
       } else {
         newBook[name] = value;
       }
     });
 
-    if (this.state.operation === "Add")  {
+    if (this.state.operation === "Add") {
       this.handleSaveBook(newBook);
     } else {
       this.handleUpdateBook(newBook);
     }
+  }
+
+  formatDate(publishDate: Date) {
+    return new Date(publishDate).toISOString().slice(0, 10);
   }
 
   componentDidMount() {
@@ -151,7 +165,7 @@ export default class Books extends React.Component<any, MyState> {
                       ISBN
                     </th>
                     <th scope="col" className="text-center align-middle">
-                      Name
+                      Title
                     </th>
                     <th scope="col" className="text-center align-middle">
                       Author
@@ -191,8 +205,8 @@ export default class Books extends React.Component<any, MyState> {
                         </td>
                         <td className="text-center align-middle">
                           <Button
-                            className="btn btn-primary mr-2"
-                            onClick={()=> this.handleAddShow(book)}
+                            className="btn btn-outline-secondary"
+                            onClick={this.handleAddShow.bind(this, book)}
                           >
                             Edit
                           </Button>
@@ -200,7 +214,7 @@ export default class Books extends React.Component<any, MyState> {
                         <td className="text-center align-middle">
                           <Button
                             className="btn btn-danger"
-                            onClick={() => this.handleDeleteShow(book)}
+                            onClick={this.handleDeleteShow.bind(this, book)}
                           >
                             Delete
                           </Button>
@@ -215,21 +229,18 @@ export default class Books extends React.Component<any, MyState> {
         </div>
         <div className="row">
           <div className="col">
-              <Button
-                className="btn btn-primary mr-2 pull-right"
-                onClick={()=> this.handleAddShow(null)}
-              >
-                Add Book
-              </Button>
+            <Button
+              className="btn btn-primary mr-2 pull-right"
+              onClick={this.handleAddShow.bind(this, null)}
+            >
+              Add Book
+            </Button>
           </div>
         </div>
 
         {/* Delete Modal */}
         <div>
-          <Modal
-            show={this.state.deleteShow}
-            onHide={() => this.handleDeleteClose()}
-          >
+          <Modal show={this.state.deleteShow} onHide={this.handleDeleteClose}>
             <Modal.Header closeButton>
               <Modal.Title>Delete Book</Modal.Title>
             </Modal.Header>
@@ -240,13 +251,13 @@ export default class Books extends React.Component<any, MyState> {
             <Modal.Footer>
               <Button
                 className="btn btn-secondary"
-                onClick={() => this.handleDeleteClose()}
+                onClick={this.handleDeleteClose}
               >
                 Close
               </Button>
               <Button
                 className="btn btn-primary"
-                onClick={() => this.handleDeleteBooks(this.state.book)}
+                onClick={this.handleDeleteBook.bind(this, this.state.book)}
               >
                 Submit
               </Button>
@@ -256,11 +267,11 @@ export default class Books extends React.Component<any, MyState> {
 
         {/* Save Modal */}
         <div>
-          <Modal show={this.state.addShow} onHide={() => this.handleAddClose()}>
+          <Modal show={this.state.addShow} onHide={this.handleAddClose}>
             <Modal.Header closeButton>
-              <Modal.Title>{this.state.operation}</Modal.Title>
+              <Modal.Title>{this.state.operation} Book</Modal.Title>
             </Modal.Header>
-            <Form onSubmit={(event)=> this.handleSubmit(event)}>
+            <Form onSubmit={this.handleSubmit}>
               <Modal.Body>
                 <FormGroup>
                   <ControlLabel>Category</ControlLabel>
@@ -325,7 +336,7 @@ export default class Books extends React.Component<any, MyState> {
               <Modal.Footer>
                 <Button
                   className="btn btn-secondary"
-                  onClick={() => this.handleAddClose()}
+                  onClick={this.handleAddClose}
                 >
                   Close
                 </Button>
