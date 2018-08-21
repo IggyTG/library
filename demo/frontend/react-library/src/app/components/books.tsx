@@ -7,7 +7,8 @@ import {
   ControlLabel,
   FormGroup,
   FormControl,
-  Form
+  Form,
+  HelpBlock
 } from "react-bootstrap";
 import BookService from "../services/book.service";
 import CategoryService from "../services/category.service";
@@ -20,6 +21,12 @@ type MyState = {
   deleteShow: boolean;
   addShow: boolean;
   operation: string;
+  error: {
+    title: string;
+    isbn: string;
+    publishDate: string;
+    author: string;
+  };
 };
 
 export default class Books extends React.Component<any, MyState> {
@@ -35,13 +42,20 @@ export default class Books extends React.Component<any, MyState> {
       addShow: false,
       books: [],
       categories: [],
-      operation: ""
+      operation: "",
+      error: {
+        title: "",
+        isbn: "",
+        publishDate: "",
+        author: ""
+      }
     };
 
     this.formatDate = this.formatDate.bind(this);
     this.handleDeleteClose = this.handleDeleteClose.bind(this);
     this.handleAddClose = this.handleAddClose.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.getValidationState = this.getValidationState.bind(this);
   }
 
   handleGetCategories() {
@@ -63,24 +77,31 @@ export default class Books extends React.Component<any, MyState> {
   }
 
   handleSaveBook(book: Book) {
-    this.bookService.saveBook(book).then(newBook => {
-      newBook.publishDate = this.formatDate(newBook.publishDate);
-      this.setState({
-        books: this.state.books.concat(newBook)
-      });
+    this.bookService.saveBook(book).then(response => {
+      if (!response.error) {
+        response.publishDate = this.formatDate(response.publishDate);
+        this.setState({ books: this.state.books.concat(response) });
+        this.handleAddClose();
+      } else {
+        this.handleErrors(response.error);
+      }
     });
-    this.handleAddClose();
-    this.setState({ books: this.state.books.concat(book) });
   }
 
   handleUpdateBook(book: Book) {
-    this.bookService.updateBook(book);
-    this.handleAddClose();
-
-    let booksCopy = this.state.books.slice();
-    let bookIndex = booksCopy.findIndex(bookCopy => bookCopy.id === book.id);
-    booksCopy[bookIndex] = book;
-    this.setState({ books: booksCopy });
+    this.bookService.updateBook(book).then(response => {
+      if (!response.error) {
+        let booksCopy = this.state.books.slice();
+        let bookIndex = booksCopy.findIndex(
+          bookCopy => bookCopy.id === book.id
+        );
+        booksCopy[bookIndex] = book;
+        this.setState({ books: booksCopy });
+        this.handleAddClose();
+      } else {
+        this.handleErrors(response.error);
+      }
+    });
   }
 
   handleDeleteClose() {
@@ -95,7 +116,15 @@ export default class Books extends React.Component<any, MyState> {
   }
 
   handleAddClose() {
-    this.setState({ addShow: false });
+    this.setState({
+      addShow: false,
+      error: {
+        title: "",
+        isbn: "",
+        publishDate: "",
+        author: ""
+      }
+    });
   }
 
   handleAddShow(book: Book) {
@@ -140,6 +169,18 @@ export default class Books extends React.Component<any, MyState> {
 
   formatDate(publishDate: Date) {
     return new Date(publishDate).toISOString().slice(0, 10);
+  }
+
+  getValidationState(error: string) {
+    return error !== "" ? "error" : null;
+  }
+
+  handleErrors(responseError) {
+    responseError.map(error => {
+      let errorCopy = Object.assign({}, this.state.error);
+      errorCopy[error.field] = error.message;
+      this.setState({ error: errorCopy });
+    });
   }
 
   componentDidMount() {
@@ -293,7 +334,11 @@ export default class Books extends React.Component<any, MyState> {
                     })}
                   </FormControl>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    this.state.error.title
+                  )}
+                >
                   <ControlLabel>Title</ControlLabel>
                   <FormControl
                     type="text"
@@ -302,8 +347,13 @@ export default class Books extends React.Component<any, MyState> {
                     defaultValue={this.state.book.title}
                     required
                   />
+                  <HelpBlock>{this.state.error.title}</HelpBlock>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    this.state.error.author
+                  )}
+                >
                   <ControlLabel>Author</ControlLabel>
                   <FormControl
                     type="text"
@@ -312,8 +362,13 @@ export default class Books extends React.Component<any, MyState> {
                     defaultValue={this.state.book.author}
                     required
                   />
+                  <HelpBlock>{this.state.error.author}</HelpBlock>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    this.state.error.publishDate
+                  )}
+                >
                   <ControlLabel>Publish Date</ControlLabel>
                   <FormControl
                     type="date"
@@ -322,8 +377,13 @@ export default class Books extends React.Component<any, MyState> {
                     defaultValue={this.state.book.publishDate}
                     required
                   />
+                  <HelpBlock>{this.state.error.publishDate}</HelpBlock>
                 </FormGroup>
-                <FormGroup>
+                <FormGroup
+                  validationState={this.getValidationState(
+                    this.state.error.isbn
+                  )}
+                >
                   <ControlLabel>ISBN</ControlLabel>
                   <FormControl
                     type="text"
@@ -332,6 +392,7 @@ export default class Books extends React.Component<any, MyState> {
                     defaultValue={this.state.book.isbn}
                     required
                   />
+                  <HelpBlock>{this.state.error.isbn}</HelpBlock>
                 </FormGroup>
               </Modal.Body>
               <Modal.Footer>

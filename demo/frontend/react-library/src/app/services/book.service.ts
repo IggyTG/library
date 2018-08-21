@@ -35,12 +35,20 @@ export default class BookService {
       .post(API, book, { headers: this.HTTP_HEADERS })
       .then(result => {
         return result.data;
+      })
+      .catch(error => {
+        return { error: error.response.data.exceptions };
       });
   }
 
   updateBook(book: Book) {
-    return axios.put(API, book, { headers: this.HTTP_HEADERS }).then(result => {
-      return result.data;
-    });
+    return axios
+      .put(API, book, { headers: this.HTTP_HEADERS })
+      .then(result => {
+        return result.data;
+      })
+      .catch(error => {
+        return { error: error.response.data.exceptions };
+      });
   }
 }
