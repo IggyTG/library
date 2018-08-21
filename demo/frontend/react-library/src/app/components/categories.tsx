@@ -182,7 +182,7 @@ export default class Categories extends React.Component<any, MyState> {
                             </td>
                             <td className="text-center align-middle">
                               <Button
-                                className="btn btn-primary mr-2"
+                                className="btn btn-outline-secondary"
                                 onClick={() => this.handleAddShow(category)}
                               >
                                 Edit

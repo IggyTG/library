@@ -24,26 +24,14 @@ export default class CategoryService {
   }
 
   saveCategory(category: Category) {
-    if (category.id) {
-      return axios
-        .put(API, category, { headers: this.HTTP_HEADERS })
-        .then(response => {
-          return response.data;
-        })
-        .catch(error => {
-          console.log(error);
-          return error;
-        });
-    } else {
-      return axios
-        .post(API, category, { headers: this.HTTP_HEADERS })
-        .then(response => {
-          return response.data;
-        })
-        .catch(error => {
-          return { error: error.response.data.exceptions[0].message };
-        });
-    }
+    return axios
+      .post(API, category, { headers: this.HTTP_HEADERS })
+      .then(response => {
+        return response.data;
+      })
+      .catch(error => {
+        return { error: error.response.data.exceptions[0].message };
+      });
   }
 
   deleteCategory(categoryId: number) {
