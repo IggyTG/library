@@ -3,7 +3,7 @@ import CategoryList from "./category-list";
 import BookList from "./books-list";
 import { Category } from "../../model/category";
 import BookService from "../../services/book.service";
-import CategoryService from "../../services/categories.service";
+import CategoryService from "../../services/category.service";
 import { Book } from "../../model/book";
 import { BtnCategory } from "./btn-category";
 

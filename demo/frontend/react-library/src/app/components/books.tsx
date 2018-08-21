@@ -10,7 +10,7 @@ import {
   Form
 } from "react-bootstrap";
 import BookService from "../services/book.service";
-import CategoryService from "../services/categories.service";
+import CategoryService from "../services/category.service";
 
 type MyState = {
   book: Book;
@@ -70,6 +70,7 @@ export default class Books extends React.Component<any, MyState> {
       });
     });
     this.handleAddClose();
+    this.setState({ books: this.state.books.concat(book) });
   }
 
   handleUpdateBook(book: Book) {

@@ -1,14 +1,16 @@
 import * as React from "react";
-import {
-  BrowserRouter as Router,
-  NavLink,
-  Route,
-  Switch,
-  Redirect,
-  Prompt
-} from "react-router-dom";
 import { History } from "history";
 import Auth from "../services/auth";
+import {
+  Button,
+  ControlLabel,
+  FormGroup,
+  FormControl,
+  Form,
+  Grid,
+  Row,
+  Col
+} from "react-bootstrap";
 
 type MyProps = { history: History; onLogin: Function };
 type MyState = { username: string; password: string; error: boolean };
@@ -45,40 +47,38 @@ export default class Login extends React.Component<MyProps, MyState> {
 
   render() {
     return (
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
-          <form onSubmit={this.login.bind(this)}>
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input
-                className="form-control"
+      <Row>
+        <Col xs={4} xsOffset={4}>
+          <Form onSubmit={this.login.bind(this)}>
+            <FormGroup>
+              <ControlLabel htmlFor="username">Username</ControlLabel>
+              <FormControl
                 type="text"
                 id="username"
                 name="username"
                 value={this.state.username}
                 onChange={this.updateUsername.bind(this)}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                className="form-control"
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel htmlFor="password">Password</ControlLabel>
+              <FormControl
                 type="password"
                 id="password"
                 name="password"
                 value={this.state.password}
                 onChange={this.updatePassword.bind(this)}
               />
-            </div>
+            </FormGroup>
             {this.state.error && (
               <div className="alert alert-danger">Bad credentials!</div>
             )}
-            <button className="btn btn-primary" type="submit">
+            <Button className="btn btn-primary" type="submit">
               Sign In
-            </button>
-          </form>
-        </div>
-      </div>
+            </Button>
+          </Form>
+        </Col>
+      </Row>
     );
   }
 }

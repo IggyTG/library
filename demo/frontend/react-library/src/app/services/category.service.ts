@@ -25,13 +25,29 @@ export default class CategoryService {
 
   saveCategory(category: Category) {
     if (category.id) {
-      return axios.put(API, category, { headers: this.HTTP_HEADERS });
+      return axios
+        .put(API, category, { headers: this.HTTP_HEADERS })
+        .then(response => {
+          return response.data;
+        });
     } else {
-      return axios.post(API, category, { headers: this.HTTP_HEADERS });
+      return axios
+        .post(API, category, { headers: this.HTTP_HEADERS })
+        .then(response => {
+          return response.data;
+        });
     }
   }
 
   deleteCategory(categoryId: number) {
     return axios.delete(API + "/" + categoryId, { headers: this.HTTP_HEADERS });
+  }
+
+  updateCategory(category: Category) {
+    return axios
+      .put(API, category, { headers: this.HTTP_HEADERS })
+      .then(result => {
+        return result.data;
+      });
   }
 }
