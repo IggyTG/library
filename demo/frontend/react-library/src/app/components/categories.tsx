@@ -6,15 +6,19 @@ import {
   FormGroup,
   FormControl,
   Form,
-  HelpBlock
+  HelpBlock,
+  Tooltip,
+  OverlayTrigger
 } from "react-bootstrap";
-import Auth from "../services/auth";
 import { Category } from "../model/category";
 import CategoryService from "../services/category.service";
+import { Book } from "../model/book";
+import BookService from "../services/book.service";
 
 type MyState = {
   category: Category;
   categories: Category[];
+  books: Book[];
   deleteShow: boolean;
   addShow: boolean;
   operation: string;
@@ -22,14 +26,15 @@ type MyState = {
 };
 
 export default class Categories extends React.Component<any, MyState> {
-  auth: Auth;
   categoryService: CategoryService = new CategoryService();
+  bookService: BookService = new BookService();
 
   constructor(props) {
     super(props);
 
     this.state = {
       categories: [],
+      books: [],
       category: new Category(null, null),
       deleteShow: false,
       addShow: false,
@@ -40,11 +45,19 @@ export default class Categories extends React.Component<any, MyState> {
 
   componentDidMount() {
     this.getCategories();
+    this.getBooks();
   }
 
   getCategories() {
     this.categoryService.getCategories().then(response => {
       this.setState({ categories: response });
+    });
+  }
+
+  getBooks() {
+    this.bookService.getBooks().then(response => {
+      this.setState({ books: response });
+      this.updateDisabledCategories();
     });
   }
 
@@ -143,7 +156,28 @@ export default class Categories extends React.Component<any, MyState> {
     }
   }
 
+  updateDisabledCategories() {
+    let categories = this.state.categories;
+    for (let i in categories) {
+      categories[i].hasBooks = this.ifCategoryExists(categories[i]);
+    }
+    this.setState({ categories: categories });
+    console.log(this.state.categories);
+  }
+
+  ifCategoryExists(categoryToDelete: Category): boolean {
+    console.log(this.state.books);
+    if (this.state.books) {
+      return this.state.books.some(
+        book => book.category.id === categoryToDelete.id
+      );
+    }
+    return false;
+  }
+
   render() {
+    const tooltip = <Tooltip id="tooltip">Category is in use!</Tooltip>;
+
     return (
       <React.Fragment>
         <div className="container">
@@ -190,12 +224,27 @@ export default class Categories extends React.Component<any, MyState> {
                               </Button>
                             </td>
                             <td className="text-center align-middle">
-                              <Button
-                                className="btn btn-danger"
-                                onClick={() => this.handleDeleteShow(category)}
+                              <span
+                                className="d-inline-block"
+                                data-toggle="tooltip"
+                                title={
+                                  category.hasBooks
+                                    ? "Category is in use!"
+                                    : null
+                                }
                               >
-                                Delete
-                              </Button>
+                                <Button
+                                  className="btn btn-danger"
+                                  onClick={() =>
+                                    this.handleDeleteShow(category)
+                                  }
+                                  disabled={category.hasBooks}
+                                  data-toggle="tooltip"
+                                  data-placement="top"
+                                >
+                                  Delete
+                                </Button>
+                              </span>
                             </td>
                           </tr>
                         );

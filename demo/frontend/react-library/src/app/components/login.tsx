@@ -1,6 +1,6 @@
 import * as React from "react";
 import { History } from "history";
-import Auth from "../services/auth";
+import Auth from "../services/auth.service";
 import {
   Button,
   ControlLabel,

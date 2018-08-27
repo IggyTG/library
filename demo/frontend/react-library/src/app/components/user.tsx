@@ -1,5 +1,5 @@
 import * as React from "react";
-import Auth from "../services/auth";
+import Auth from "../services/auth.service";
 import { NavDropdown, MenuItem } from "react-bootstrap";
 import { Redirect } from "react-router-dom";
 

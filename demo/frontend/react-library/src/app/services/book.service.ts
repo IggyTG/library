@@ -1,5 +1,5 @@
 import axios from "axios";
-import Auth from "./auth";
+import Auth from "./auth.service";
 import { Book } from "../model/book";
 
 const API = "http://localhost:8080/books";

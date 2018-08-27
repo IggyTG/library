@@ -1,6 +1,6 @@
 import * as React from "react";
 import CategoryList from "./category-list";
-import BookList from "./books-list";
+import BookList from "./book-list";
 import { Category } from "../../model/category";
 import BookService from "../../services/book.service";
 import CategoryService from "../../services/category.service";
