@@ -6,9 +6,7 @@ import {
   FormGroup,
   FormControl,
   Form,
-  HelpBlock,
-  Tooltip,
-  OverlayTrigger
+  HelpBlock
 } from "react-bootstrap";
 import { Category } from "../model/category";
 import CategoryService from "../services/category.service";
@@ -162,11 +160,9 @@ export default class Categories extends React.Component<any, MyState> {
       categories[i].hasBooks = this.ifCategoryExists(categories[i]);
     }
     this.setState({ categories: categories });
-    console.log(this.state.categories);
   }
 
   ifCategoryExists(categoryToDelete: Category): boolean {
-    console.log(this.state.books);
     if (this.state.books) {
       return this.state.books.some(
         book => book.category.id === categoryToDelete.id

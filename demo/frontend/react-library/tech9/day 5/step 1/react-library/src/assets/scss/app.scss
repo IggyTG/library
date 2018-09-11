@@ -10,3 +10,13 @@ $border-color: red;
     background-color: $bg-color;
   }
 }
+
+#nav-dropdown {
+  color: gray;
+  text-decoration: none;
+}
+
+#nav-dropdown:focus {
+  color: black;
+  text-decoration: none;
+}
